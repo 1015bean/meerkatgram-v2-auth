@@ -1,6 +1,8 @@
 package com.meerkatgramv2auth.domain.auth.controller;
 
 import com.meerkatgramv2auth.domain.auth.request.LoginRequestDTO;
+import com.meerkatgramv2auth.domain.auth.response.AuthResponseDTO;
+import com.meerkatgramv2auth.domain.auth.service.AuthService;
 import com.meerkatgramv2auth.global.response.GlobalRes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,13 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-//    @PreAuthorize("isAuthenticated()")
+    private final AuthService authService;
+
+    // @PreAuthorize("hasRole('SUPER')")  // 리퀘스트 권한 설정(인증 여부)  hasRole('롤')/isAuthenticated()
     @PostMapping("/login")
-    public ResponseEntity<GlobalRes<Void>> login(
+    public ResponseEntity<GlobalRes<AuthResponseDTO>> login(
             @Valid @RequestBody LoginRequestDTO loginRequestDTO,
             HttpServletResponse response
             ) {
-        return ResponseEntity.ok(GlobalRes.success());
+        return ResponseEntity.ok(GlobalRes.success(authService.login(response, loginRequestDTO)));
     }
 
 }
