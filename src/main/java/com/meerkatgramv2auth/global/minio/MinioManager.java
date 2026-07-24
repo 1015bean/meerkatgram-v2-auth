@@ -62,19 +62,25 @@ public class MinioManager {
         return path.toString().replace(File.separator, "/");
     }
 
+    // 파일 업로드
+        // objectKey: 오브젝트의 key(파일을 저장할 주소)
     public void uploadFile(String objectKey, MultipartFile file) {
+
+        // InputStream: 파일 데이터를 바이트 형식으로 읽어내는 통로(파일을 실재로 전송하기 위해 형태를 변환)
         try(InputStream inputStream = file.getInputStream()) {
+            // MinIO 서버에 요청 보내기
+                // .putObject: 파일 저장 req   PutObjectArgs.builder(): 옵션 설정
             minioClient
                     .putObject(
                             PutObjectArgs.builder()
                                     .bucket(minioConfig.minioBucket())  // 파일이 저장될 Minio의 버킷명
-                                    .object(objectKey)   // 파일 내부에서 관리될 전체 저장 경로
+                                    .object(objectKey)   // 파일명 & 저장될 파일 경로
                                     .stream(
                                             inputStream,   // 업로드할 파일의 InputStream
                                             file.getSize(),   // 업로드할 파일의 크기
                                             -1               // 업로드할 패킷 크기(-1은 MinIo가 적절히 조절해서 전송)
                                     )
-                                    .contentType(file.getContentType())   // 파일의 Mime 타입
+                                    .contentType(file.getContentType())   // 파일의 Mime 타입(사진, 텍스트, PDF..)
                                     .build()
                     );
         } catch (Exception e) {
@@ -82,13 +88,17 @@ public class MinioManager {
         }
     }
 
+    // 업로드된 파일의 URL를 생성
     public String createMinioObjectUri(String objectKey) {
+
+        // Path.of(): 경로를 운영체제에 맞게 합쳐줌
         Path path = Path.of(minioConfig.minioBucket(), objectKey);
 
+        // String.format( 형태"요소1/요소2", 요소1, 요소2 )
         return String.format(
                 "%s/%s",
                 minioConfig.minioEndpoint(),
-                path.toString().replace(File.separator, "/")
+                path.toString().replace(File.separator, "/")   // 운영체제에 맞는 경로 문자열을 반환
         );
     }
 }
