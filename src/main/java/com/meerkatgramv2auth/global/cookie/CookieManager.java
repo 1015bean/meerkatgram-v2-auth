@@ -13,8 +13,33 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class CookieManager {
-
     private final JwtConfig jwtConfig;
+
+    public void setRefreshTokenToCookie(HttpServletResponse response, String refreshToken) {
+        this.setCookie(
+                response,
+                jwtConfig.refreshTokenCookieName(),
+                refreshToken,
+                jwtConfig.refreshTokenCookieExpiry(),
+                jwtConfig.reissueUri()
+        );
+    }
+
+    public void removeRefreshToken(HttpServletResponse response) {
+        this.setCookie(
+                response
+                , jwtConfig.refreshTokenCookieName()
+                , null
+                , 0
+                , jwtConfig.reissueUri()
+        );
+    }
+
+    public Optional<String> getRefreshTokenToCookie(HttpServletRequest request) {
+        return this.getCookie(request, jwtConfig.refreshTokenCookieName())
+                .map(Cookie::getValue);
+    }
+
 
     // Request Header에서 특정 쿠키 획득(Optional 반환)
     // request:  요청 받은 데이터
@@ -44,5 +69,6 @@ public class CookieManager {
 
         response.addCookie(cookie);
     }
+
 
 }
