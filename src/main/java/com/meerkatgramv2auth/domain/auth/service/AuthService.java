@@ -67,7 +67,7 @@ public class AuthService {
     private AuthResponseDTO generateAuthentication(HttpServletResponse response, User user) {
         // 토큰 생성
         String accessToken = jwtProvider.generateAccessToken(user);
-        String refreshToken = jwtProvider.generateAccessToken(user);
+        String refreshToken = jwtProvider.generateRefreshToken(user);
 
         // 리프래시토큰 DB 저장 처리
         user.setRefreshToken(refreshToken);
